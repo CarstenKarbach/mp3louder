@@ -19,20 +19,22 @@ RUN python3 -m venv venv
 RUN venv/bin/pip install -r requirements.txt
 RUN venv/bin/pip install gunicorn
 
-COPY ["Readme.txt", "app.py", "boot.sh", "config.py", "requirements.txt", \
+COPY ["Readme.txt", "app.py", "config.py", "requirements.txt", \
             "./"]
 COPY "static" "./static"
 COPY "templates" "./templates"
 COPY "uploads" "./uploads"
-
-RUN chmod +x boot.sh
 
 ENV FLASK_APP app.py
 ENV APP_NAME "supermp3"
 
 RUN chown -R appuser:appuser ./
 
-USER appuser
+RUN apt-get install -y openssh-server
+RUN mkdir ~/.ssh
+COPY "boot.sh" "./"
+RUN chmod +x boot.sh
 
 EXPOSE 5000
+EXPOSE 22
 ENTRYPOINT ["./boot.sh"]
