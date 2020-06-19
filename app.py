@@ -31,16 +31,20 @@ def mp3gaininfo():
     return output
 
 def mp3gainFile(db, file):
-    stream = os.popen('mp3gain -c -d ' + str(db) + ' -r ' + file + ' 2>&1 && echo "|"$?')
+    stream = os.popen('mp3gain -c -d ' + str(db) + ' -r ' + file + ' 2>&1 ; echo "|7"')
     output = stream.read()
     pos = output.rfind("|")
     if pos >= 0:
         rc = int(output[pos + 1:])
     else:
         rc = -1
+    indicateSuccess = ('No changes to', 'Applying mp3 gain change of')
+    success = len(list(filter(lambda to_search: (to_search in output), indicateSuccess )))
+    if success >=1:
+        rc = 0
     res = "Thanks for your file upload, stored at " + file
     res += "\ndb=" + str(db)
-    res += "\nMP3Gain Run:\n" + output + "\nRC=" + str(rc)
+    res += "\nMP3Gain Run:\n" + output + "\nRC=" + str(rc)+"\nsuccesses="+str(success)
 
     return (rc, res)
 
